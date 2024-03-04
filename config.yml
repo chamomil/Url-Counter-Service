@@ -1,0 +1,6 @@
+postgres:
+  database: url-counter
+  user: postgres
+  password: 4829HeLL00
+  host: localhost
+  port: 5432
