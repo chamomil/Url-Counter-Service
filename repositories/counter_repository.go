@@ -17,3 +17,12 @@ func CreateCounter(counter *models.Counter, ctx context.Context) error {
 
 	return nil
 }
+
+func GetUrlByCode(code string, ctx context.Context) (string, error) {
+	var url string
+	err := db.Conn.QueryRow(ctx, `SELECT "url" FROM "counter" WHERE code = $1`, code).Scan(&url)
+	if err != nil {
+		return "", err
+	}
+	return url, nil
+}
