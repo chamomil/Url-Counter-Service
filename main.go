@@ -39,5 +39,6 @@ func main() {
 	r := router.New()
 	routes.CountersRoutes(r)
 
+	log.Print("Server running on port 8080. Try http://localhost:8080/counters")
 	log.Fatal(fasthttp.ListenAndServe(":8080", r.Handler))
 }
