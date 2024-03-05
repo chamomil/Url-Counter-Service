@@ -6,11 +6,12 @@ import (
 )
 
 type PostgresConfig struct {
-	Host     string
-	Port     uint16
-	User     string
-	Password string
-	Database string
+	Host          string
+	Port          uint16
+	User          string
+	Password      string
+	Database      string
+	RunMigrations bool `yaml:"run_migrations"`
 }
 
 type Config struct {

@@ -6,7 +6,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-var conn *pgx.Conn
+var Conn *pgx.Conn
 
 func InitConnection(c context.Context, config *config.PostgresConfig) error {
 	connConfig, _ := pgx.ParseConfig("")
@@ -17,7 +17,7 @@ func InitConnection(c context.Context, config *config.PostgresConfig) error {
 	connConfig.Database = config.Database
 
 	var err error
-	conn, err = pgx.ConnectConfig(c, connConfig)
+	Conn, err = pgx.ConnectConfig(c, connConfig)
 	if err != nil {
 		return err
 	}
@@ -25,5 +25,5 @@ func InitConnection(c context.Context, config *config.PostgresConfig) error {
 }
 
 func CloseConnection(c context.Context) error {
-	return conn.Close(c)
+	return Conn.Close(c)
 }

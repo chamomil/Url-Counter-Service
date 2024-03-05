@@ -19,6 +19,12 @@ func Initialize() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	if configData.Postgres.RunMigrations {
+		err = db.RunMigrations("migrations")
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
 }
 
 func Finalize() {

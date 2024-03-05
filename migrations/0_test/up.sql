@@ -1,0 +1,10 @@
+CREATE TABLE counter (
+    id SERIAL PRIMARY KEY,
+    url TEXT NOT NULL,
+    code INTEGER UNIQUE NOT NULL
+);
+
+CREATE TABLE redirect (
+    id SERIAL PRIMARY KEY,
+    date TIMESTAMPTZ NOT NULL
+);
