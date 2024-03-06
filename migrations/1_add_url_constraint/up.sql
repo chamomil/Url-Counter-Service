@@ -1,0 +1,1 @@
+ALTER TABLE counter ADD CONSTRAINT url_constraint CHECK ( "url" ~* '^(http(s|):\/\/).+\.(com|by|ru|so|html|org|dev|edu|net)' )

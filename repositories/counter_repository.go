@@ -26,3 +26,33 @@ func GetUrlByCode(code string, ctx context.Context) (string, error) {
 	}
 	return url, nil
 }
+
+func GetCounters(name string, ctx context.Context) (*[]models.Counter, error) {
+	var counters []models.Counter
+	if name == "" {
+		rows, err := db.Conn.Query(ctx, `SELECT * FROM "counter"`)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var counter models.Counter
+			err := rows.Scan(&counter.Id, &counter.Url, &counter.Code, &counter.Name)
+			if err != nil {
+				return nil, err
+			}
+			counters = append(counters, counter)
+		}
+
+	} else {
+		var counter models.Counter
+		err := db.Conn.QueryRow(ctx, `SELECT * FROM "counter" WHERE "name" = $1`, name).Scan(&counter)
+		if err != nil {
+			return nil, err
+		}
+		counters = append(counters, counter)
+	}
+
+	return &counters, nil
+}

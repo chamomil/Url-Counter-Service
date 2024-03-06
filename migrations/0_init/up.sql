@@ -7,5 +7,6 @@ CREATE TABLE counter (
 
 CREATE TABLE redirect (
     id SERIAL PRIMARY KEY,
-    date TIMESTAMPTZ NOT NULL
+    date TIMESTAMPTZ NOT NULL,
+    counter_id INT REFERENCES counter(id)
 );

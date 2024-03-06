@@ -15,3 +15,7 @@ func CreateCounter(counter *models.Counter) error {
 func GetUrlByCode(code string) (string, error) {
 	return repositories.GetUrlByCode(code, context.Background())
 }
+
+func GetCounters(name string) (*[]models.Counter, error) {
+	return repositories.GetCounters(name, context.Background())
+}
