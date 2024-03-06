@@ -14,7 +14,7 @@ func CreateCounterHandler(ctx *fasthttp.RequestCtx) {
 	err := json.Unmarshal(ctx.PostBody(), &counter)
 	if err != nil {
 		log.Print(err.Error())
-		ctx.Response.SetBody([]byte("error in params conversion"))
+		ctx.Response.SetBody([]byte(err.Error()))
 		ctx.Response.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -22,7 +22,7 @@ func CreateCounterHandler(ctx *fasthttp.RequestCtx) {
 	err = services.CreateCounter(&counter)
 	if err != nil {
 		log.Print(err.Error())
-		ctx.Response.SetBody([]byte("error in creating counter"))
+		ctx.Response.SetBody([]byte(err.Error()))
 		ctx.Response.SetStatusCode(fasthttp.StatusInternalServerError)
 		return
 	}
@@ -31,14 +31,14 @@ func CreateCounterHandler(ctx *fasthttp.RequestCtx) {
 
 	if err != nil {
 		log.Print(err.Error())
-		ctx.Response.SetBody([]byte("error in response body conversion"))
+		ctx.Response.SetBody([]byte(err.Error()))
 		ctx.Response.SetStatusCode(fasthttp.StatusInternalServerError)
 		return
 	}
 
 	ctx.Response.SetBody(body)
 
-	log.Print("Added counter")
+	ctx.Response.SetStatusCode(fasthttp.StatusCreated)
 
 }
 
@@ -55,8 +55,8 @@ func Redirect(ctx *fasthttp.RequestCtx) {
 	url, err := services.GetUrlByCode(code)
 	if err != nil {
 		log.Print(err.Error())
-		ctx.Response.SetBody([]byte("error getting url from db"))
-		ctx.Response.SetStatusCode(fasthttp.StatusInternalServerError)
+		ctx.Response.SetBody([]byte(err.Error()))
+		ctx.Response.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
 
@@ -83,11 +83,41 @@ func GetCounters(ctx *fasthttp.RequestCtx) {
 
 	if err != nil {
 		log.Print(err.Error())
-		ctx.Response.SetBody([]byte("error in response body conversion"))
+		ctx.Response.SetBody([]byte(err.Error()))
 		ctx.Response.SetStatusCode(fasthttp.StatusInternalServerError)
 		return
 	}
 
 	ctx.Response.SetBody(body)
+	ctx.Response.SetStatusCode(fasthttp.StatusFound)
+}
 
+func RedirectStats(ctx *fasthttp.RequestCtx) {
+	code, ok := ctx.UserValue("code").(string)
+
+	if !ok {
+		log.Print("invalid code")
+		ctx.Response.SetBody([]byte("invalid code"))
+		ctx.Response.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	count, err := services.GetRedirects(code)
+	if err != nil {
+		log.Print(err.Error())
+		ctx.Response.SetBody([]byte(err.Error()))
+		ctx.Response.SetStatusCode(fasthttp.StatusNotFound)
+	}
+
+	var body []byte
+	body, err = json.Marshal(count)
+	if err != nil {
+		log.Print(err.Error())
+		ctx.Response.SetBody([]byte(err.Error()))
+		ctx.Response.SetStatusCode(fasthttp.StatusInternalServerError)
+		return
+	}
+
+	ctx.Response.SetBody(body)
+	ctx.Response.SetStatusCode(fasthttp.StatusFound)
 }

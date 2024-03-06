@@ -13,9 +13,22 @@ func CreateCounter(counter *models.Counter) error {
 }
 
 func GetUrlByCode(code string) (string, error) {
-	return repositories.GetUrlByCode(code, context.Background())
+	url, err := repositories.GetUrlByCode(code, context.Background())
+	if err != nil {
+		return "", err
+	}
+	err = CreateRedirect(code)
+	return url, err
 }
 
 func GetCounters(name string) (*[]models.Counter, error) {
 	return repositories.GetCounters(name, context.Background())
+}
+
+func CreateRedirect(code string) error {
+	return repositories.CreateRedirect(code, context.Background())
+}
+
+func GetRedirects(code string) (uint, error) {
+	return repositories.GetRedirectsByCode(code, context.Background())
 }

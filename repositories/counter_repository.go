@@ -4,6 +4,7 @@ import (
 	"Url-Counter-Service/db"
 	"Url-Counter-Service/models"
 	"context"
+	"time"
 )
 
 func CreateCounter(counter *models.Counter, ctx context.Context) error {
@@ -25,6 +26,24 @@ func GetUrlByCode(code string, ctx context.Context) (string, error) {
 		return "", err
 	}
 	return url, nil
+}
+
+func GetCounterIdByCode(code string, ctx context.Context) (uint, error) {
+	var id uint
+	err := db.Conn.QueryRow(ctx, `SELECT "id" FROM "counter" WHERE code = $1`, code).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+func CreateRedirect(code string, ctx context.Context) error {
+	id, err := GetCounterIdByCode(code, ctx)
+	if err != nil {
+		return err
+	}
+	_, err = db.Conn.Exec(ctx, `INSERT INTO "redirect" ("date", "counter_id") VALUES ($1, $2)`, time.Now(), id)
+	return err
 }
 
 func GetCounters(name string, ctx context.Context) (*[]models.Counter, error) {
@@ -55,4 +74,15 @@ func GetCounters(name string, ctx context.Context) (*[]models.Counter, error) {
 	}
 
 	return &counters, nil
+}
+
+func GetRedirectsByCode(code string, ctx context.Context) (uint, error) {
+	id, err := GetCounterIdByCode(code, ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	var count uint
+	err = db.Conn.QueryRow(ctx, `SELECT COUNT(id) FROM redirect WHERE counter_id = $1 GROUP BY counter_id`, id).Scan(&count)
+	return count, err
 }
