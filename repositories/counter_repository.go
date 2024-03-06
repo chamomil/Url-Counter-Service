@@ -3,7 +3,9 @@ package repositories
 import (
 	"Url-Counter-Service/db"
 	"Url-Counter-Service/models"
+	"Url-Counter-Service/types"
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -46,34 +48,57 @@ func CreateRedirect(code string, ctx context.Context) error {
 	return err
 }
 
-func GetCounters(name string, ctx context.Context) (*[]models.Counter, error) {
+func GetCounters(name string, limit, offset int, ctx context.Context) (*types.PaginationResult[models.Counter], error) {
 	var counters []models.Counter
-	if name == "" {
-		rows, err := db.Conn.Query(ctx, `SELECT * FROM "counter"`)
-		if err != nil {
-			return nil, err
-		}
-		defer rows.Close()
+	args := make([]any, 0)
+	query := `SELECT * FROM "counter"`
+	countQuery := `SELECT COUNT(*) AS "total" FROM "counter"`
 
-		for rows.Next() {
-			var counter models.Counter
-			err := rows.Scan(&counter.Id, &counter.Url, &counter.Code, &counter.Name)
-			if err != nil {
-				return nil, err
-			}
-			counters = append(counters, counter)
-		}
+	if name != "" {
+		index := len(args) + 1
 
-	} else {
+		queryStep := fmt.Sprintf(` WHERE "name" ILIKE $%d`, index)
+		query += queryStep
+		countQuery += queryStep
+
+		args = append(args, name)
+	}
+
+	var total uint
+	err := db.Conn.QueryRow(ctx, countQuery, args...).Scan(&total)
+	if err != nil {
+		return nil, err
+	}
+
+	if limit != 0 {
+		index := len(args) + 1
+		query += fmt.Sprintf(` LIMIT $%d`, index)
+		args = append(args, limit)
+	}
+	if offset != 0 {
+		index := len(args) + 1
+		query += fmt.Sprintf(` OFFSET $%d`, index)
+		args = append(args, offset)
+	}
+
+	rows, err := db.Conn.Query(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
 		var counter models.Counter
-		err := db.Conn.QueryRow(ctx, `SELECT * FROM "counter" WHERE "name" = $1`, name).Scan(&counter)
+		err := rows.Scan(&counter.Id, &counter.Url, &counter.Code, &counter.Name)
 		if err != nil {
 			return nil, err
 		}
 		counters = append(counters, counter)
 	}
 
-	return &counters, nil
+	return &types.PaginationResult[models.Counter]{
+		Items: &counters, Total: total,
+	}, nil
 }
 
 func GetRedirectsByCode(code string, ctx context.Context) (uint, error) {

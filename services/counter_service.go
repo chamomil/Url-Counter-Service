@@ -3,6 +3,7 @@ package services
 import (
 	"Url-Counter-Service/models"
 	"Url-Counter-Service/repositories"
+	"Url-Counter-Service/types"
 	"context"
 	"github.com/google/uuid"
 )
@@ -21,8 +22,8 @@ func GetUrlByCode(code string) (string, error) {
 	return url, err
 }
 
-func GetCounters(name string) (*[]models.Counter, error) {
-	return repositories.GetCounters(name, context.Background())
+func GetCounters(name string, limit int, offset int) (*types.PaginationResult[models.Counter], error) {
+	return repositories.GetCounters(name, limit, offset, context.Background())
 }
 
 func CreateRedirect(code string) error {

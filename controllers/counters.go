@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"github.com/valyala/fasthttp"
 	"log"
+	"strconv"
 )
 
 func CreateCounterHandler(ctx *fasthttp.RequestCtx) {
@@ -48,7 +49,7 @@ func Redirect(ctx *fasthttp.RequestCtx) {
 	if !ok {
 		log.Print("invalid code")
 		ctx.Response.SetBody([]byte("invalid code"))
-		ctx.Response.SetStatusCode(fasthttp.StatusBadRequest)
+		ctx.Response.SetStatusCode(fasthttp.StatusUnprocessableEntity)
 		return
 	}
 
@@ -65,11 +66,23 @@ func Redirect(ctx *fasthttp.RequestCtx) {
 }
 
 func GetCounters(ctx *fasthttp.RequestCtx) {
-	var name string
+	name := string(ctx.QueryArgs().Peek("name"))
+	limit, err := strconv.Atoi(string(ctx.QueryArgs().Peek("limit")))
+	if err != nil {
+		log.Print("invalid limit")
+		ctx.Response.SetBody([]byte("invalid limit"))
+		ctx.Response.SetStatusCode(fasthttp.StatusUnprocessableEntity)
+		return
+	}
+	offset, err := strconv.Atoi(string(ctx.QueryArgs().Peek("offset")))
+	if err != nil {
+		log.Print("invalid offset")
+		ctx.Response.SetBody([]byte("invalid offset"))
+		ctx.Response.SetStatusCode(fasthttp.StatusUnprocessableEntity)
+		return
+	}
 
-	_ = json.Unmarshal(ctx.Request.Body(), &name)
-
-	counters, err := services.GetCounters(name)
+	counters, err := services.GetCounters(name, limit, offset)
 
 	if err != nil {
 		log.Print(err.Error())
@@ -88,6 +101,7 @@ func GetCounters(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
+	ctx.Response.Header.Set("Content-Type", "json")
 	ctx.Response.SetBody(body)
 	ctx.Response.SetStatusCode(fasthttp.StatusFound)
 }
