@@ -68,18 +68,21 @@ func Redirect(ctx *fasthttp.RequestCtx) {
 func GetCounters(ctx *fasthttp.RequestCtx) {
 	name := string(ctx.QueryArgs().Peek("name"))
 	limit, err := strconv.Atoi(string(ctx.QueryArgs().Peek("limit")))
+
 	if err != nil {
-		log.Print("invalid limit")
-		ctx.Response.SetBody([]byte("invalid limit"))
-		ctx.Response.SetStatusCode(fasthttp.StatusUnprocessableEntity)
-		return
+		limit = 0
+		//log.Print("invalid limit")
+		//ctx.Response.SetBody([]byte("invalid limit"))
+		//ctx.Response.SetStatusCode(fasthttp.StatusUnprocessableEntity)
+		//return
 	}
 	offset, err := strconv.Atoi(string(ctx.QueryArgs().Peek("offset")))
 	if err != nil {
-		log.Print("invalid offset")
-		ctx.Response.SetBody([]byte("invalid offset"))
-		ctx.Response.SetStatusCode(fasthttp.StatusUnprocessableEntity)
-		return
+		offset = 0
+		//log.Print("invalid offset")
+		//ctx.Response.SetBody([]byte("invalid offset"))
+		//ctx.Response.SetStatusCode(fasthttp.StatusUnprocessableEntity)
+		//return
 	}
 
 	counters, err := services.GetCounters(name, limit, offset)
@@ -121,6 +124,7 @@ func RedirectStats(ctx *fasthttp.RequestCtx) {
 		log.Print(err.Error())
 		ctx.Response.SetBody([]byte(err.Error()))
 		ctx.Response.SetStatusCode(fasthttp.StatusNotFound)
+		return
 	}
 
 	var body []byte

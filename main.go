@@ -5,6 +5,7 @@ import (
 	"Url-Counter-Service/db"
 	"Url-Counter-Service/routes"
 	"context"
+	"fmt"
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 	"log"
@@ -33,12 +34,22 @@ func Finalize() {
 	}
 }
 
+func GetServerPort() uint {
+	configData, err := config.ReadConfig("config.yml")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	return configData.Server_port
+}
+
 func main() {
 	Initialize()
 	defer Finalize()
 	r := router.New()
 	routes.CountersRoutes(r)
 
-	log.Print("Server running on port 8080. Try http://localhost:8080/counters")
-	log.Fatal(fasthttp.ListenAndServe(":8080", r.Handler))
+	port := GetServerPort()
+	address := fmt.Sprintf(":%d", port)
+	log.Printf("Server running on port %d. Try http://localhost%s/counters", port, address)
+	log.Fatal(fasthttp.ListenAndServe(address, r.Handler))
 }

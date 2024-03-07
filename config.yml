@@ -5,3 +5,4 @@ postgres:
   host: localhost
   port: 5432
   run_migrations: y
+server_port: 8080

@@ -15,7 +15,8 @@ type PostgresConfig struct {
 }
 
 type Config struct {
-	Postgres PostgresConfig
+	Postgres    PostgresConfig
+	Server_port uint
 }
 
 func ReadConfig(configPath string) (*Config, error) {

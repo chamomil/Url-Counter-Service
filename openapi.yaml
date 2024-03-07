@@ -1,0 +1,140 @@
+openapi: 3.0.3
+info:
+  title: Url counter
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /counters:
+    get:
+      tags:
+        - counters
+      summary: Get counters list
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: uint
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            format: uint
+      responses:
+        '200':
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Counter'
+                  total:
+                    type: number
+                    format: uint
+        '422':
+          description: Invalid input
+    post:
+      tags:
+        - counters
+      summary: Adds a new url redirect counter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - url
+              properties:
+                name:
+                  type: string
+                  example: example-name
+                url:
+                  type: string
+                  format: uri
+                  example: https://go.dev/
+        required: true
+      responses:
+        '201':
+          description: Resourse created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Counter'
+        '422':
+          description: Invalid input
+  /counters/{code}:
+    get:
+      tags:
+        - counters
+      summary: Redirect to counter url
+      parameters:
+        - name: code
+          in: path
+          description: Code of counter
+          required: true
+          schema:
+            type: string
+      responses:
+        '308':
+          description: successful redirect
+        '404':
+          description: Counter not found
+  /counters/{code}/stats:
+    get:
+      tags:
+        - counters
+      summary: Get counter statistcs
+      parameters:
+        - name: code
+          in: path
+          description: Code of counter
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Found redirects
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: uint
+                example: 10
+        '404':
+          description: Not found
+components:
+
+  schemas:
+    Counter:
+      required:
+        - id
+        - name
+        - url
+        - code
+      type: object
+      properties:
+        id:
+          type: integer
+          format: uint
+          example: 10
+        name:
+          type: string
+          example: example-name
+        url:
+          type: string
+          format: uri
+          example: https://go.dev/
+        code:
+          type: string
+          format: 'uuidV4'
+          example: cfdc5863-796a-461b-96c2-8b41d4174cf7
