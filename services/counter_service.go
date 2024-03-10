@@ -25,11 +25,3 @@ func GetUrlByCode(code string) (string, error) {
 func GetCounters(name string, limit int, offset int) (*types.PaginationResult[models.Counter], error) {
 	return repositories.GetCounters(name, limit, offset, context.Background())
 }
-
-func CreateRedirect(code string) error {
-	return repositories.CreateRedirect(code, context.Background())
-}
-
-func GetRedirects(code string) (uint, error) {
-	return repositories.GetRedirectsByCode(code, context.Background())
-}

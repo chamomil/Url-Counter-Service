@@ -28,12 +28,6 @@ func Initialize() {
 	}
 }
 
-func Finalize() {
-	if err := db.CloseConnection(context.Background()); err != nil {
-		log.Fatal(err.Error())
-	}
-}
-
 func GetServerPort() uint {
 	configData, err := config.ReadConfig("config.yml")
 	if err != nil {
@@ -44,7 +38,6 @@ func GetServerPort() uint {
 
 func main() {
 	Initialize()
-	defer Finalize()
 	r := router.New()
 	routes.CountersRoutes(r)
 

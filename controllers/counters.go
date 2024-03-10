@@ -24,7 +24,7 @@ func CreateCounterHandler(ctx *fasthttp.RequestCtx) {
 	if err != nil {
 		log.Print(err.Error())
 		ctx.Response.SetBody([]byte(err.Error()))
-		ctx.Response.SetStatusCode(fasthttp.StatusInternalServerError)
+		ctx.Response.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
 	var body []byte
@@ -49,7 +49,7 @@ func Redirect(ctx *fasthttp.RequestCtx) {
 	if !ok {
 		log.Print("invalid code")
 		ctx.Response.SetBody([]byte("invalid code"))
-		ctx.Response.SetStatusCode(fasthttp.StatusUnprocessableEntity)
+		ctx.Response.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
@@ -90,7 +90,7 @@ func GetCounters(ctx *fasthttp.RequestCtx) {
 	if err != nil {
 		log.Print(err.Error())
 		ctx.Response.SetBody([]byte(err.Error()))
-		ctx.Response.SetStatusCode(fasthttp.StatusInternalServerError)
+		ctx.Response.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
 
@@ -104,9 +104,9 @@ func GetCounters(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	ctx.Response.Header.Set("Content-Type", "json")
+	ctx.Response.Header.Set("Content-Type", "application/json")
 	ctx.Response.SetBody(body)
-	ctx.Response.SetStatusCode(fasthttp.StatusFound)
+	ctx.Response.SetStatusCode(fasthttp.StatusOK)
 }
 
 func RedirectStats(ctx *fasthttp.RequestCtx) {
@@ -137,5 +137,5 @@ func RedirectStats(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.Response.SetBody(body)
-	ctx.Response.SetStatusCode(fasthttp.StatusFound)
+	ctx.Response.SetStatusCode(fasthttp.StatusOK)
 }
