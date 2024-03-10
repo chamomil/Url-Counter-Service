@@ -14,10 +14,18 @@ type PostgresConfig struct {
 	RunMigrations bool `yaml:"run_migrations"`
 }
 
-type Config struct {
-	Postgres    PostgresConfig
-	Server_port uint
+type UserCredentials struct {
+	Username string
+	Password string
 }
+
+type Config struct {
+	Postgres   PostgresConfig
+	ServerPort uint `yaml:"server_port"`
+	Users      []UserCredentials
+}
+
+var Data Config
 
 func ReadConfig(configPath string) (*Config, error) {
 	data, err := os.ReadFile(configPath)
@@ -25,10 +33,9 @@ func ReadConfig(configPath string) (*Config, error) {
 		return nil, err
 	}
 
-	var config Config
-	if err := yaml.Unmarshal(data, &config); err != nil {
+	if err := yaml.Unmarshal(data, &Data); err != nil {
 		return nil, err
 	}
 
-	return &config, nil
+	return &Data, nil
 }

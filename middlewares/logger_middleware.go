@@ -9,10 +9,10 @@ import (
 
 var output = log.New(os.Stdout, "", log.LstdFlags)
 
-func Logger(req fasthttp.RequestHandler) fasthttp.RequestHandler {
+func Logger(handler fasthttp.RequestHandler) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
 		begin := time.Now()
-		req(ctx)
+		handler(ctx)
 		end := time.Now()
 		total := end.Sub(begin)
 

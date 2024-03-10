@@ -6,3 +6,6 @@ postgres:
   port: 5432
   run_migrations: y
 server_port: 8080
+users:
+  - username: admin
+    password: admin

@@ -7,6 +7,8 @@ servers:
 paths:
   /counters:
     get:
+      security:
+        - basicAuth: []
       tags:
         - counters
       summary: Get counters list
@@ -40,11 +42,15 @@ paths:
                   total:
                     type: number
                     format: uint
+        '401':
+          description: Unauthorized
         '404':
           description: Invalid input
         '500':
           description: Server error
     post:
+      security:
+        - basicAuth: [ ]
       tags:
         - counters
       summary: Adds a new url redirect counter
@@ -74,10 +80,14 @@ paths:
                 $ref: '#/components/schemas/Counter'
         '400':
           description: Invalid input
+        '401':
+          description: Unauthorized
         '500':
           description: Server error
   /counters/{code}:
     get:
+      security:
+        - basicAuth: [ ]
       tags:
         - counters
       summary: Redirect to counter url
@@ -93,10 +103,16 @@ paths:
           description: Successful redirect
         '400':
           description: Invalid input
+        '401':
+          description: Unauthorized
         '404':
           description: Counter not found
+        '500':
+          description: Server error
   /counters/{code}/stats:
     get:
+      security:
+        - basicAuth: [ ]
       tags:
         - counters
       summary: Get counter statistcs
@@ -120,10 +136,15 @@ paths:
           description: Not found
         '400':
           description: Invalid code
+        '401':
+          description: Unauthorized
         '500':
           description: Server error
 components:
-
+  securitySchemes:
+    basicAuth: # <-- arbitrary name for the security scheme
+      type: http
+      scheme: basic
   schemas:
     Counter:
       required:
@@ -148,3 +169,5 @@ components:
           type: string
           format: 'uuidV4'
           example: cfdc5863-796a-461b-96c2-8b41d4174cf7
+security:
+  - basicAuth: []

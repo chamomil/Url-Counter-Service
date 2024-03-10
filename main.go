@@ -29,21 +29,13 @@ func Initialize() {
 	}
 }
 
-func GetServerPort() uint {
-	configData, err := config.ReadConfig("config.yml")
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	return configData.Server_port
-}
-
 func main() {
 	Initialize()
 	r := router.New()
 	routes.CountersRoutes(r)
 
-	port := GetServerPort()
+	port := config.Data.ServerPort
 	address := fmt.Sprintf(":%d", port)
 	log.Printf("Server running on port %d. Try http://localhost%s/counters", port, address)
-	log.Fatal(fasthttp.ListenAndServe(address, middlewares.Logger(r.Handler)))
+	log.Fatal(fasthttp.ListenAndServe(address, middlewares.Apply(r.Handler, middlewares.Auth, middlewares.Logger)))
 }
