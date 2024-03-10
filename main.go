@@ -3,6 +3,7 @@ package main
 import (
 	"Url-Counter-Service/config"
 	"Url-Counter-Service/db"
+	"Url-Counter-Service/middlewares"
 	"Url-Counter-Service/routes"
 	"context"
 	"fmt"
@@ -44,5 +45,5 @@ func main() {
 	port := GetServerPort()
 	address := fmt.Sprintf(":%d", port)
 	log.Printf("Server running on port %d. Try http://localhost%s/counters", port, address)
-	log.Fatal(fasthttp.ListenAndServe(address, r.Handler))
+	log.Fatal(fasthttp.ListenAndServe(address, middlewares.Logger(r.Handler)))
 }
