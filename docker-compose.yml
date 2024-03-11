@@ -1,0 +1,22 @@
+version: '3.9'
+services:
+  url-counter-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    links:
+      - "db:postgres"
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: url-counter
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+volumes:
+  pg_data:
